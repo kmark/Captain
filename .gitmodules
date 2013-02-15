@@ -1,0 +1,3 @@
+[submodule "CaptainBase/USBHostShield2"]
+	path = CaptainBase/USBHostShield2
+	url = git://github.com/felis/USB_Host_Shield_2.0.git
