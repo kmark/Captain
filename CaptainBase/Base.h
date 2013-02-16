@@ -29,8 +29,15 @@ public:
     void setup();
     void loop();
 private:
-    bool controllerConnected;
-    void handleController();
+    bool controllerConnected; // true if controller is connected, false otherwise
+    int stickSensitivity; // Prevents servo convulsions
+    Button thrustLockButton; // Button to use for thrust locking
+    Button thrustButton; // Analog button to use for thrust control
+    AnalogHat directionalButton; // Joystick used for directional control
+    int currentThrust; // Current thrust
+    int currentDirection; // Current direction
+    bool thrustLock; // true if thrust lock is on, false otherwise
+    void handleController(); // Handles all DS3 inputs
 };
 
 #endif

@@ -30,12 +30,23 @@ USB Usb;
 LiquidCrystal lcd(62, 63, 64, 65, 66, 67);
 
 void Base::setup() {
-    controllerConnected = false;
-    analogWrite(69, 255);
     lcd.begin(16, 2);
     lcd.clear();
-    Serial.begin(115200);
     lcd.print("Loading...      ");
+    
+    controllerConnected = false;
+    stickSensitivity = 3;
+    thrustLockButton = CIRCLE;
+    thrustButton = R2;
+    directionalButton = LeftHatX;
+    currentThrust = 0;
+    currentDirection = 0;
+    thrustLock = false;
+    
+    analogWrite(69, 255);
+    
+    Serial.begin(115200);
+
     if(Usb.Init() == -1) {
         lcd.print("OSC didn't start!");
         while(1);
@@ -62,6 +73,14 @@ void Base::handleController() {
             PS3.disconnect();
             lcd.setCursor(0, 0);
             lcd.println("DS3 Disconnected");
+            return;
+        }
+        currentDirection = PS3.getAnalogHat(directionalButton);
+        if(!thrustLock) {
+            currentThrust = PS3.getAnalogButton(thrustButton);
+        }
+        if(PS3.getButtonClick(thrustLockButton)) {
+            thrustLock = !thrustLock;
         }
     }
     else if(controllerConnected) {
