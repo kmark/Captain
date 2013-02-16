@@ -27,21 +27,44 @@ USB Usb;
     PS3USB PS3(&Usb);
 #endif
 
+LiquidCrystal lcd(62, 63, 64, 65, 66, 67);
+
 void Base::setup() {
+    controllerConnected = false;
+    analogWrite(69, 255);
+    lcd.begin(16, 2);
+    lcd.clear();
     Serial.begin(115200);
+    lcd.print("Loading...      ");
     if(Usb.Init() == -1) {
-        Serial.println("OSC did not start!");
+        lcd.print("OSC didn't start!");
         while(1);
     }
-    Serial.println("PS3 Bluetooth Library Initialized");
+    lcd.setCursor(0, 0);
+    lcd.print("Ready for DS3...");
+    lcd.setCursor(0, 1);
+    lcd.print("Awaiting XBee...");
 }
 
 void Base::loop() {
+    handleController();
+}
+
+void Base::handleController() {
     Usb.Task();
     if(PS3.PS3Connected || PS3.PS3NavigationConnected) {
-        if(PS3.getButtonClick(PS)) {
-            Serial.println("Disconnecting controller...");
-            PS3.disconnect();
+        if(!controllerConnected) {
+            controllerConnected = true;
+            lcd.setCursor(0, 0);
+            lcd.print("DS3 Connected   ");
         }
+        if(PS3.getButtonClick(PS)) {
+            PS3.disconnect();
+            lcd.setCursor(0, 0);
+            lcd.println("DS3 Disconnected");
+        }
+    }
+    else if(controllerConnected) {
+        controllerConnected = false;
     }
 }

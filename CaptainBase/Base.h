@@ -21,12 +21,16 @@
 #include "Arduino.h"
 #include "PS3BT.h"
 #include "PS3USB.h"
+#include "LiquidCrystal.h"
 #include "CaptainBase.h"
 
 class Base {
 public:
     void setup();
     void loop();
+private:
+    bool controllerConnected;
+    void handleController();
 };
 
 #endif
