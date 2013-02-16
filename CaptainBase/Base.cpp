@@ -15,14 +15,33 @@
  * along with Captain.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _CaptainBase_h
-#define _CaptainBase_h
-#define USEPS3BT // Comment out to use direct USB
-
-#include "Arduino.h"
 #include "Base.h"
 
-void setup();
-void loop();
 
+// I'd really like to move this into the Base class somehow...
+USB Usb;
+#ifdef USEPS3BT
+    BTD Btd(&Usb);
+    PS3BT PS3(&Btd);
+#else
+    PS3USB PS3(&Usb);
 #endif
+
+void Base::setup() {
+    Serial.begin(115200);
+    if(Usb.Init() == -1) {
+        Serial.println("OSC did not start!");
+        while(1);
+    }
+    Serial.println("PS3 Bluetooth Library Initialized");
+}
+
+void Base::loop() {
+    Usb.Task();
+    if(PS3.PS3Connected || PS3.PS3NavigationConnected) {
+        if(PS3.getButtonClick(PS)) {
+            Serial.println("Disconnecting controller...");
+            PS3.disconnect();
+        }
+    }
+}

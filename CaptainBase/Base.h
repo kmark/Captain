@@ -15,14 +15,18 @@
  * along with Captain.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _CaptainBase_h
-#define _CaptainBase_h
-#define USEPS3BT // Comment out to use direct USB
+#ifndef _Base_h
+#define _Base_h
 
 #include "Arduino.h"
-#include "Base.h"
+#include "PS3BT.h"
+#include "PS3USB.h"
+#include "CaptainBase.h"
 
-void setup();
-void loop();
+class Base {
+public:
+    void setup();
+    void loop();
+};
 
 #endif

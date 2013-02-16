@@ -17,11 +17,13 @@
 
 #include "CaptainBase.h"
 
+// Completely isolate all functionality within a class
+Base base;
 
 void setup() {
-    
+    base.setup();
 }
 
 void loop() {
-    
+    base.loop();
 }
