@@ -23,16 +23,16 @@
 #include "TinyGPS.h"
 
 class Ship {
+    float latitude;
+    float longitude;
+    unsigned long fixAge;
+    float speed; // In knots
 public:
     Ship();
     void setup();
     void loop();
 private:
-    float latitude;
-    float longitude;
-    unsigned long fixAge;
-    float speed; // In knots
-    float altitude; // In meters
+    void handleGPS();
 };
 
 #endif
