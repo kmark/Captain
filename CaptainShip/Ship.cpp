@@ -17,10 +17,46 @@
 
 #include "Ship.h"
 
-void Ship::setup() {
+TinyGPS gps;
+SoftwareSerial gpsSerial(14, 15);
+unsigned int loops = 0;
+
+Ship::Ship() : latitude(TinyGPS::GPS_INVALID_F_ANGLE),
+longitude(TinyGPS::GPS_INVALID_F_ANGLE), fixAge(TinyGPS::GPS_INVALID_AGE),
+altitude(TinyGPS::GPS_INVALID_F_ALTITUDE), speed(TinyGPS::GPS_INVALID_F_SPEED) {
     
 }
 
+void Ship::setup() {
+    Serial.begin(115200);
+    gpsSerial.begin(9600);
+    Serial.print("Starting up GPS communications using TinyGPS v");
+    Serial.println(TinyGPS::library_version());
+}
+
 void Ship::loop() {
-    
+    loops++;
+    while(gpsSerial.available()) {
+        if(gps.encode(gpsSerial.read())) {
+            gps.f_get_position(&latitude, &longitude, &fixAge);
+            altitude = gps.f_altitude();
+            speed = gps.f_speed_knots();
+        }
+    }
+    // For testing
+    if(loops % 10000 == 0) {
+        if(fixAge == TinyGPS::GPS_INVALID_AGE) {
+            Serial.println("Invalid GPS signal...");
+            return;
+        }
+        Serial.print("Location: ");
+        Serial.print(latitude, 8);
+        Serial.print(", ");
+        Serial.print(longitude, 8);
+        Serial.print(" Altitude: ");
+        Serial.print(altitude, 2);
+        Serial.print(" meters Speed: ");
+        Serial.print(speed, 2);
+        Serial.println(" knots");
+    }
 }

@@ -19,11 +19,20 @@
 #define _Ship_h
 
 #include "Arduino.h"
+#include "SoftwareSerial.h"
+#include "TinyGPS.h"
 
 class Ship {
 public:
+    Ship();
     void setup();
     void loop();
+private:
+    float latitude;
+    float longitude;
+    unsigned long fixAge;
+    float speed; // In knots
+    float altitude; // In meters
 };
 
 #endif
