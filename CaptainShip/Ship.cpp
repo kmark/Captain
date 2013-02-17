@@ -32,6 +32,10 @@ void Ship::setup() {
     gpsSerial.begin(9600);
     Serial.print("Starting up GPS communications using TinyGPS v");
     Serial.println(TinyGPS::library_version());
+    // GPRMC data only
+    gpsSerial.println(PMTK_SET_NMEA_OUTPUT_RMCONLY);
+    // Update once per second (1Hz)
+    gpsSerial.println(PMTK_SET_NMEA_UPDATE_1HZ);
 }
 
 void Ship::loop() {
