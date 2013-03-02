@@ -28,7 +28,7 @@ Ship::Ship() : latitude(TinyGPS::GPS_INVALID_F_ANGLE),
 }
 
 void Ship::setup() {
-    Serial.begin(115200);
+    Serial.begin(19200); // XBee
     gpsSerial.begin(9600);
     Serial.print("Starting up GPS communications using TinyGPS v");
     Serial.println(TinyGPS::library_version());
@@ -48,21 +48,21 @@ void Ship::loop() {
             Serial.println("Invalid GPS signal...");
             return;
         }
-        Serial.print("Location: ");
-        Serial.print(latitude, 8);
-        Serial.print(", ");
-        Serial.print(longitude, 8);
-        Serial.print(" Speed: ");
-        Serial.print(speed, 2);
-        Serial.println(" knots");
     }
 }
 
 void Ship::handleGPS() {
     while(gpsSerial.available()) {
-        if(gps.encode(gpsSerial.read())) {
+       if(gps.encode(gpsSerial.read())) {
             gps.f_get_position(&latitude, &longitude, &fixAge);
             speed = gps.f_speed_knots();
+            // Format is $GPS,lat,lon,knots
+            Serial.print("$GPS,");
+            Serial.print(latitude, 10);
+            Serial.print(",");
+            Serial.print(longitude, 10);
+            Serial.print(",");
+            Serial.println(speed, 2);
         }
     }
 }
