@@ -19,7 +19,6 @@
 
 TinyGPS gps;
 SoftwareSerial gpsSerial(14, 15);
-unsigned int loops = 0;
 
 Ship::Ship() : latitude(TinyGPS::GPS_INVALID_F_ANGLE),
  longitude(TinyGPS::GPS_INVALID_F_ANGLE), fixAge(TinyGPS::GPS_INVALID_AGE),
@@ -40,29 +39,22 @@ void Ship::setup() {
 
 void Ship::loop() {
     handleGPS();
-    
-    // For testing
-    loops++;
-    if(loops % 10000 == 0) {
-        if(fixAge == TinyGPS::GPS_INVALID_AGE) {
-            Serial.println("Invalid GPS signal...");
-            return;
-        }
-    }
 }
 
 void Ship::handleGPS() {
     while(gpsSerial.available()) {
        if(gps.encode(gpsSerial.read())) {
-            gps.f_get_position(&latitude, &longitude, &fixAge);
-            speed = gps.f_speed_knots();
-            // Format is $GPS,lat,lon,knots
-            Serial.print("$GPS,");
-            Serial.print(latitude, 10);
-            Serial.print(",");
-            Serial.print(longitude, 10);
-            Serial.print(",");
-            Serial.println(speed, 2);
+           gps.f_get_position(&latitude, &longitude, &fixAge);
+           speed = gps.f_speed_knots();
+           // Format is $GPS,act,lat,lon,speed
+           Serial.print("$GPS,");
+           Serial.print(fixAge == TinyGPS::GPS_INVALID_AGE ? "V" : "A");
+           Serial.print(",");
+           Serial.print(latitude, 10);
+           Serial.print(",");
+           Serial.print(longitude, 10);
+           Serial.print(",");
+           Serial.println(speed, 2);
         }
     }
 }
