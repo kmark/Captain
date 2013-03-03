@@ -21,6 +21,8 @@
 #include "Arduino.h"
 #include "SoftwareSerial.h"
 #include "TinyGPS.h"
+#include "avr/io.h"
+#include "avr/interrupt.h"
 
 // NMEA commands
 #define PMTK_SET_NMEA_UPDATE_1HZ  "$PMTK220,1000*1F"
@@ -35,10 +37,12 @@ class Ship {
     float longitude;
     unsigned long fixAge;
     float speed; // In knots
+    unsigned int interruptCount;
 public:
     Ship();
     void setup();
     void loop();
+    void handleInterrupt();
 private:
     void handleGPS();
 };
