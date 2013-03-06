@@ -129,7 +129,22 @@ bool Base::rxEncode(char c) {
 }
 
 bool Base::rxTermComplete() {
-    Serial.print("TERM ");
-    Serial.println(rxTermNum);
-    Serial.println(rxBuffer);
+    if(rxTermNum == 0) {
+        if(!strcmp(rxBuffer, "GPS")) {
+            rxSentenceType = CAPTAIN_SENTENCE_GPS;
+        }
+    }
+    switch (rxSentenceType) {
+        case CAPTAIN_SENTENCE_GPS:
+            switch(rxTermNum) {
+                case 1:
+                    if(rxBuffer[0] == 'V') {
+                        Serial.println("GPS not valid!");
+                    }
+                    break;
+            }
+            break;
+        default:
+            return false;
+    }
 }
