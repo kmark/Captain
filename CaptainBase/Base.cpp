@@ -32,7 +32,7 @@ LiquidCrystal lcd(62, 63, 64, 65, 66, 67);
 void Base::setup() {
     lcd.begin(16, 2);
     lcd.clear();
-    lcd.print("Loading...      ");
+    lcd.print("Loading...");
     
     controllerConnected = false;
     stickSensitivity = 3;
@@ -43,9 +43,13 @@ void Base::setup() {
     currentDirection = 0;
     thrustLock = false;
     
+    rxTermNum = 0;
+    rxSentenceType = CAPTAIN_SENTENCE_UNKNOWN;
+    
     analogWrite(69, 255);
     
     Serial.begin(115200);
+    Serial3.begin(19200);
 
     if(Usb.Init() == -1) {
         lcd.print("OSC didn't start!");
@@ -59,6 +63,7 @@ void Base::setup() {
 
 void Base::loop() {
     handleController();
+    handleRx();
 }
 
 void Base::handleController() {
@@ -86,4 +91,45 @@ void Base::handleController() {
     else if(controllerConnected) {
         controllerConnected = false;
     }
+}
+
+void Base::handleRx() {
+    while(Serial3.available()) {
+        rxEncode(Serial3.read());
+    }
+}
+
+// The below will probably be put into some kind
+// of "CaptainCommunication" library...
+// Based on NMEA and TinyGPS
+
+bool Base::rxEncode(char c) {
+    bool valid = false;
+    switch(c) {
+        case ',': // term terminators
+        case '\r':
+        case '\n':
+            // Ignores the LF or \n in CR+LF or \r\n terminators
+            if(rxBufferOffset == 0) {
+                return valid;
+            }
+            valid = rxTermComplete();
+            rxBufferOffset = 0;
+            memset(rxBuffer, 0, sizeof(rxBuffer));
+            rxTermNum++;
+            return valid;
+        case '$': // sentence begin
+            rxSentenceType = CAPTAIN_SENTENCE_UNKNOWN;
+            rxTermNum = rxBufferOffset = 0;
+            memset(rxBuffer, 0, sizeof(rxBuffer));
+            return valid;
+    }
+    rxBuffer[rxBufferOffset++] = c;
+    return valid;
+}
+
+bool Base::rxTermComplete() {
+    Serial.print("TERM ");
+    Serial.println(rxTermNum);
+    Serial.println(rxBuffer);
 }

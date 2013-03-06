@@ -37,7 +37,18 @@ private:
     int currentThrust; // Current thrust
     int currentDirection; // Current direction
     bool thrustLock; // true if thrust lock is on, false otherwise
+
     void handleController(); // Handles all DS3 inputs
+    
+    void handleRx(); // Handles received data from the XBee
+    bool rxEncode(char);
+    bool rxTermComplete();
+    bool rxInTerm;
+    unsigned short rxTermNum;
+    byte rxSentenceType;
+    char rxBuffer[15];
+    unsigned int rxBufferOffset;
+    enum { CAPTAIN_SENTENCE_GPS, CAPTAIN_SENTENCE_UNKNOWN };
 };
 
 #endif
