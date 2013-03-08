@@ -48,7 +48,12 @@ private:
     byte rxSentenceType;
     char rxBuffer[15];
     unsigned int rxBufferOffset;
-    enum { CAPTAIN_SENTENCE_GPS, CAPTAIN_SENTENCE_UNKNOWN };
+    enum { CAPTAIN_SENTENCE_GPS, CAPTAIN_SENTENCE_CDT, CAPTAIN_SENTENCE_UNKNOWN };
+    String rxLatitude;
+    String rxLongitude;
+    bool rxActive;
+    String rxSpeed;
+    void rxSendTerm(int, char[][15], int);
 };
 
 #endif

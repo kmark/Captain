@@ -45,6 +45,10 @@ void Base::setup() {
     
     rxTermNum = 0;
     rxSentenceType = CAPTAIN_SENTENCE_UNKNOWN;
+    rxSpeed = NULL;
+    rxLatitude = NULL;
+    rxLongitude = NULL;
+    rxActive = false;
     
     analogWrite(69, 255);
     
@@ -59,6 +63,9 @@ void Base::setup() {
     lcd.print("Ready for DS3...");
     lcd.setCursor(0, 1);
     lcd.print("Awaiting XBee...");
+    
+    char data[2][15] = { { "Hello" }, { "World!" } };
+    rxSendTerm(CAPTAIN_SENTENCE_CDT, data, 2);
 }
 
 void Base::loop() {
@@ -95,7 +102,10 @@ void Base::handleController() {
 
 void Base::handleRx() {
     while(Serial3.available()) {
-        rxEncode(Serial3.read());
+        if(rxEncode(Serial3.read())) {
+            lcd.setCursor(0, 1);
+            lcd.print(rxActive ? "GPS: Active   " : "GPS: Not Active ");
+        }
     }
 }
 
@@ -124,6 +134,7 @@ bool Base::rxEncode(char c) {
             memset(rxBuffer, 0, sizeof(rxBuffer));
             return valid;
     }
+    // Data. Not a $ or terminator. Add it to the buffer.
     rxBuffer[rxBufferOffset++] = c;
     return valid;
 }
@@ -138,13 +149,39 @@ bool Base::rxTermComplete() {
         case CAPTAIN_SENTENCE_GPS:
             switch(rxTermNum) {
                 case 1:
-                    if(rxBuffer[0] == 'V') {
-                        Serial.println("GPS not valid!");
-                    }
+                    rxActive = rxBuffer[0] == 'A';
+                    break;
+                case 2:
+                    rxLatitude = String(rxBuffer);
+                    break;
+                case 3:
+                    rxLongitude = String(rxBuffer);
+                    break;
+                case 4:
+                    rxSpeed = String(rxBuffer);
                     break;
             }
             break;
         default:
             return false;
     }
+    return true;
+}
+
+// dsize = sizeof(data)
+void Base::rxSendTerm(int termType, char data[][15], int dsize) {
+    String term = "$";
+    switch(termType) {
+        case CAPTAIN_SENTENCE_CDT:
+            term += "CDT";
+            break;
+        default:
+            return;
+    }
+    for(int i = 0; i < dsize; i++) {
+        term += ",";
+        term += data[i];
+    }
+    term += "\r\n";
+    Serial.println(term);
 }
