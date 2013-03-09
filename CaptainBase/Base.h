@@ -52,8 +52,10 @@ private:
     String rxLatitude;
     String rxLongitude;
     bool rxActive;
+    unsigned long rxLastTerm;
     String rxSpeed;
     void rxSendTerm(int, char[][15], int);
+    bool rxStale();
 };
 
 #endif

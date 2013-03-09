@@ -49,6 +49,7 @@ void Base::setup() {
     rxLatitude = NULL;
     rxLongitude = NULL;
     rxActive = false;
+    rxLastTerm = 5000;
     
     analogWrite(69, 255);
     
@@ -140,6 +141,7 @@ bool Base::rxEncode(char c) {
 }
 
 bool Base::rxTermComplete() {
+    rxLastTerm = millis();
     if(rxTermNum == 0) {
         if(!strcmp(rxBuffer, "GPS")) {
             rxSentenceType = CAPTAIN_SENTENCE_GPS;
@@ -184,4 +186,16 @@ void Base::rxSendTerm(int termType, char data[][15], int dsize) {
     }
     term += "\r\n";
     Serial.println(term);
+
+// Convenience function
+bool Base::rxStale() {
+    unsigned long mil = millis();
+    if(mil <= 10000 && rxLastTerm == 5000) {
+        return true;
+    }
+    return mil - rxLastTerm >= 5000;
+    // Shorthand for the above
+    // return (mil <= 10000 && rxLastTerm == 5000) ? true : (mil - rxLastTerm >= 5000);
+}
+
 }
