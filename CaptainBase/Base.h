@@ -23,19 +23,22 @@
 #include "PS3USB.h"
 #include "LiquidCrystal.h"
 #include "CaptainBase.h"
+#include "avr/io.h"
+#include "avr/interrupt.h"
 
 class Base {
 public:
     void setup();
     void loop();
+    void handleInterrupt();
 private:
     bool controllerConnected; // true if controller is connected, false otherwise
     int stickSensitivity; // Prevents servo convulsions
     Button thrustLockButton; // Button to use for thrust locking
     Button thrustButton; // Analog button to use for thrust control
     AnalogHat directionalButton; // Joystick used for directional control
-    int currentThrust; // Current thrust
-    int currentDirection; // Current direction
+    unsigned int currentThrust; // Current thrust
+    unsigned int currentDirection; // Current direction
     bool thrustLock; // true if thrust lock is on, false otherwise
 
     void handleController(); // Handles all DS3 inputs
@@ -56,6 +59,7 @@ private:
     String rxSpeed;
     void rxSendTerm(int, char[][15], int);
     bool rxStale();
+    unsigned int interruptCount;
 };
 
 #endif

@@ -28,6 +28,7 @@ USB Usb;
 #endif
 
 LiquidCrystal lcd(62, 63, 64, 65, 66, 67);
+Base *baseInstance = NULL;
 
 void Base::setup() {
     lcd.begin(16, 2);
@@ -64,9 +65,15 @@ void Base::setup() {
     lcd.print("Ready for DS3...");
     lcd.setCursor(0, 1);
     lcd.print("Awaiting XBee...");
-    
-    char data[2][15] = { { "Hello" }, { "World!" } };
-    rxSendTerm(CAPTAIN_SENTENCE_CDT, data, 2);
+
+    interruptCount = 0;
+    baseInstance = this;
+    TCCR2A = 0; // Wave gen mode normal
+    TCCR2B = 0; // Disable
+    TCNT2 = 130; // set timer count to 130 of 255
+    TIFR2 = 0; // Clear overflow flag
+    TIMSK2 = 1; // Enable timer compare interrupt
+    TCCR2B = 5; // Timer prescaler to 128
 }
 
 void Base::loop() {
@@ -186,6 +193,7 @@ void Base::rxSendTerm(int termType, char data[][15], int dsize) {
     }
     term += "\r\n";
     Serial.println(term);
+}
 
 // Convenience function
 bool Base::rxStale() {
@@ -198,4 +206,16 @@ bool Base::rxStale() {
     // return (mil <= 10000 && rxLastTerm == 5000) ? true : (mil - rxLastTerm >= 5000);
 }
 
+void Base::handleInterrupt() {
+    interruptCount++;
+    if(interruptCount % 100 == 0 && !rxStale()) {
+        char data[2][15] = { NULL, NULL };
+        sprintf(data[0], "%u", currentDirection);
+        sprintf(data[1], "%u", currentThrust);
+        rxSendTerm(CAPTAIN_SENTENCE_CDT, data, 2);
+    }
+}
+
+ISR(TIMER2_OVF_vect) {
+    baseInstance->handleInterrupt();
 }
