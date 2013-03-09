@@ -60,6 +60,7 @@ private:
     void rxSendTerm(int, char[][15], int);
     bool rxStale();
     unsigned int interruptCount;
+    HardwareSerial *XBee;
 };
 
 #endif

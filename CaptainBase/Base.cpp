@@ -67,6 +67,7 @@ void Base::setup() {
     lcd.print("Awaiting XBee...");
 
     interruptCount = 0;
+    XBee = &Serial3;
     baseInstance = this;
     TCCR2A = 0; // Wave gen mode normal
     TCCR2B = 0; // Disable
@@ -192,7 +193,7 @@ void Base::rxSendTerm(int termType, char data[][15], int dsize) {
         term += data[i];
     }
     term += "\r\n";
-    Serial.println(term);
+    XBee->println(term);
 }
 
 // Convenience function
@@ -208,11 +209,11 @@ bool Base::rxStale() {
 
 void Base::handleInterrupt() {
     interruptCount++;
-    if(interruptCount % 100 == 0 && !rxStale()) {
-        char data[2][15] = { NULL, NULL };
-        sprintf(data[0], "%u", currentDirection);
-        sprintf(data[1], "%u", currentThrust);
-        rxSendTerm(CAPTAIN_SENTENCE_CDT, data, 2);
+    if(interruptCount % 50 == 0 && !rxStale()) {
+        XBee->print("$CDT,");
+        XBee->print(currentDirection);
+        XBee->print(',');
+        XBee->println(currentThrust);
     }
 }
 
