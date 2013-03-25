@@ -38,7 +38,9 @@ private:
     Button thrustButton; // Analog button to use for thrust control
     AnalogHat directionalButton; // Joystick used for directional control
     unsigned int currentThrust; // Current thrust
+    unsigned int oldThrust;
     unsigned int currentDirection; // Current direction
+    unsigned int oldDirection;
     bool thrustLock; // true if thrust lock is on, false otherwise
 
     void handleController(); // Handles all DS3 inputs

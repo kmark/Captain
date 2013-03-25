@@ -41,7 +41,9 @@ void Base::setup() {
     thrustButton = R2;
     directionalButton = LeftHatX;
     currentThrust = 0;
+    oldThrust = 1;
     currentDirection = 0;
+    oldDirection = 1;
     thrustLock = false;
     
     rxTermNum = 0;
@@ -210,6 +212,11 @@ bool Base::rxStale() {
 void Base::handleInterrupt() {
     interruptCount++;
     if(interruptCount % 50 == 0 && !rxStale()) {
+        if(oldThrust == currentThrust && oldDirection == currentDirection) {
+            return;
+        }
+        oldThrust = currentThrust;
+        oldDirection = currentDirection;
         XBee->print("$CDT,");
         XBee->print(currentDirection);
         XBee->print(',');
