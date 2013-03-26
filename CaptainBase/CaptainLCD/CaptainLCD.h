@@ -31,6 +31,7 @@ public:
     void setThrust(unsigned int);
     void setThrustLock(bool);
     void setRxActive(bool);
+    void setDirection(unsigned int);
 private:
     void setBacklight(unsigned int, unsigned int, unsigned int);
     unsigned int _rgbPins[3];
@@ -38,6 +39,7 @@ private:
     unsigned int _thrust;
     bool _thrustLock;
     bool _rxActive;
+    unsigned int _direction;
 };
 
 #endif

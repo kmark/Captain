@@ -19,6 +19,7 @@
 
 byte check[8] = {0,1,3,22,28,8,0,0};
 byte xmark[8] = {0,27,14,4,14,27,0,0};
+byte odot[8] = {0,14,31,27,31,14,0,0};
 
 CaptainLCD::CaptainLCD(unsigned int rs, unsigned int enable, unsigned int d4,
                        unsigned int d5, unsigned int d6, unsigned int d7,
@@ -26,10 +27,12 @@ CaptainLCD::CaptainLCD(unsigned int rs, unsigned int enable, unsigned int d4,
 : LiquidCrystal(rs, enable, d4, d5, d6, d7) {
     LiquidCrystal::createChar(1, check);
     LiquidCrystal::createChar(2, xmark);
+    LiquidCrystal::createChar(3, odot);
     _gpsActive = false;
     _thrust = 0;
     _thrustLock = false;
     _rxActive = false;
+    _direction = 128;
     pinMode(r, OUTPUT);
     pinMode(g, OUTPUT);
     pinMode(b, OUTPUT);
@@ -48,6 +51,8 @@ void CaptainLCD::begin() {
     LiquidCrystal::write(2);
     LiquidCrystal::print(" GPS");
     LiquidCrystal::write(2);
+    LiquidCrystal::setCursor(5, 1);
+    LiquidCrystal::write(3);
 }
 
 void CaptainLCD::setBacklight(unsigned int r, unsigned int g, unsigned int b) {
@@ -117,4 +122,15 @@ void CaptainLCD::setRxActive(bool active) {
         return;
     }
     setBacklight(200, 200, 0);
+}
+
+void CaptainLCD::setDirection(unsigned int direction) {
+    if(_direction == direction) {
+        return;
+    }
+    LiquidCrystal::setCursor(map(_direction, 0, 255, 0, 11), 1);
+    LiquidCrystal::print(" ");
+    LiquidCrystal::setCursor(map(direction, 0, 255, 0, 11), 1);
+    LiquidCrystal::write(3);
+    _direction = direction;
 }

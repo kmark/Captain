@@ -41,7 +41,7 @@ void Base::setup() {
     directionalButton = LeftHatX;
     currentThrust = 0;
     oldThrust = 1;
-    currentDirection = 0;
+    currentDirection = 128;
     oldDirection = 1;
     thrustLock = false;
     
@@ -96,6 +96,7 @@ void Base::handleController() {
             return;
         }
         currentDirection = PS3.getAnalogHat(directionalButton);
+        lcd->setDirection(currentDirection);
         if(!thrustLock) {
             currentThrust = PS3.getAnalogButton(thrustButton);
             lcd->setThrust(currentThrust);
