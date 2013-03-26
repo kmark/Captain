@@ -23,13 +23,17 @@
 
 class CaptainLCD : public LiquidCrystal {
 public:
-    CaptainLCD(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
+    CaptainLCD(unsigned int, unsigned int, unsigned int, unsigned int,
+               unsigned int, unsigned int, unsigned int, unsigned int,
+               unsigned int);
     void begin();
     void setGPSActive(bool);
     void setThrust(unsigned int);
     void setThrustLock(bool);
     void setRxActive(bool);
 private:
+    void setBacklight(unsigned int, unsigned int, unsigned int);
+    unsigned int _rgbPins[3];
     bool _gpsActive;
     unsigned int _thrust;
     bool _thrustLock;

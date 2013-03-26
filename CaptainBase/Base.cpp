@@ -31,7 +31,7 @@ USB Usb;
 Base *baseInstance = NULL;
 
 void Base::setup() {
-    lcd = new CaptainLCD(62, 63, 64, 65, 66, 67);
+    lcd = new CaptainLCD(62, 63, 64, 65, 66, 67, 61, 68, 69);
     lcd->begin();
     
     controllerConnected = false;
@@ -52,8 +52,6 @@ void Base::setup() {
     rxLongitude = NULL;
     rxActive = false;
     rxLastTerm = 5000;
-    
-    analogWrite(69, 255);
     
     Serial.begin(115200);
     Serial3.begin(19200);
