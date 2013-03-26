@@ -21,8 +21,8 @@
 #include "Arduino.h"
 #include "PS3BT.h"
 #include "PS3USB.h"
-#include "LiquidCrystal.h"
 #include "CaptainBase.h"
+#include "CaptainLCD.h"
 #include "avr/io.h"
 #include "avr/interrupt.h"
 
@@ -63,6 +63,7 @@ private:
     bool rxStale();
     unsigned int interruptCount;
     HardwareSerial *XBee;
+    CaptainLCD *lcd;
 };
 
 #endif

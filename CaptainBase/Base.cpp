@@ -27,13 +27,12 @@ USB Usb;
     PS3USB PS3(&Usb);
 #endif
 
-LiquidCrystal lcd(62, 63, 64, 65, 66, 67);
+//CaptainLCD lcd(62, 63, 64, 65, 66, 67);
 Base *baseInstance = NULL;
 
 void Base::setup() {
-    lcd.begin(16, 2);
-    lcd.clear();
-    lcd.print("Loading...");
+    lcd = new CaptainLCD(62, 63, 64, 65, 66, 67);
+    lcd->begin();
     
     controllerConnected = false;
     stickSensitivity = 3;
@@ -60,13 +59,13 @@ void Base::setup() {
     Serial3.begin(19200);
 
     if(Usb.Init() == -1) {
-        lcd.print("OSC didn't start!");
+        lcd->print("OSC didn't start!");
         while(1);
     }
-    lcd.setCursor(0, 0);
-    lcd.print("Ready for DS3...");
-    lcd.setCursor(0, 1);
-    lcd.print("Awaiting XBee...");
+    //lcd->setCursor(0, 0);
+    //lcd->print("Ready for DS3...");
+    //lcd->setCursor(0, 1);
+    //lcd->print("Awaiting XBee...");
 
     interruptCount = 0;
     XBee = &Serial3;
@@ -89,21 +88,23 @@ void Base::handleController() {
     if(PS3.PS3Connected || PS3.PS3NavigationConnected) {
         if(!controllerConnected) {
             controllerConnected = true;
-            lcd.setCursor(0, 0);
-            lcd.print("DS3 Connected   ");
+            //lcd->setCursor(0, 0);
+            //lcd->print("DS3 Connected   ");
         }
         if(PS3.getButtonClick(PS)) {
             PS3.disconnect();
-            lcd.setCursor(0, 0);
-            lcd.println("DS3 Disconnected");
+            //lcd->setCursor(0, 0);
+            //lcd->println("DS3 Disconnected");
             return;
         }
         currentDirection = PS3.getAnalogHat(directionalButton);
         if(!thrustLock) {
             currentThrust = PS3.getAnalogButton(thrustButton);
+            lcd->setThrust(currentThrust);
         }
         if(PS3.getButtonClick(thrustLockButton)) {
             thrustLock = !thrustLock;
+            lcd->setThrustLock(thrustLock);
         }
     }
     else if(controllerConnected) {
@@ -113,9 +114,10 @@ void Base::handleController() {
 
 void Base::handleRx() {
     while(Serial3.available()) {
-        if(rxEncode(Serial3.read())) {
-            lcd.setCursor(0, 1);
-            lcd.print(rxActive ? "GPS: Active   " : "GPS: Not Active ");
+        char lolz = Serial3.read();
+        Serial.write(lolz);
+        if(rxEncode(lolz)) {
+            lcd->setGPSActive(rxActive);
         }
     }
 }
@@ -211,16 +213,22 @@ bool Base::rxStale() {
 
 void Base::handleInterrupt() {
     interruptCount++;
-    if(interruptCount % 50 == 0 && !rxStale()) {
-        if(oldThrust == currentThrust && oldDirection == currentDirection) {
+    if(interruptCount % 50 == 0) {
+        bool stale = rxStale();
+        lcd->setRxActive(!stale);
+        if(stale || (oldThrust == currentThrust && oldDirection == currentDirection)) {
             return;
         }
         oldThrust = currentThrust;
         oldDirection = currentDirection;
         XBee->print("$CDT,");
+        Serial.print("$CDT,");
         XBee->print(currentDirection);
+        Serial.print(currentDirection);
         XBee->print(',');
+        Serial.print(',');
         XBee->println(currentThrust);
+        Serial.println(currentThrust);
     }
 }
 

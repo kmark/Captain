@@ -15,7 +15,25 @@
  * along with Captain.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef _CaptainLCD_h
+#define _CaptainLCD_h
+
 #include "LiquidCrystal.h"
-#include "PS3BT.h"
-#include "PS3USB.h"
-#include "CaptainLCD.h"
+#include "Arduino.h"
+
+class CaptainLCD : public LiquidCrystal {
+public:
+    CaptainLCD(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int);
+    void begin();
+    void setGPSActive(bool);
+    void setThrust(unsigned int);
+    void setThrustLock(bool);
+    void setRxActive(bool);
+private:
+    bool _gpsActive;
+    unsigned int _thrust;
+    bool _thrustLock;
+    bool _rxActive;
+};
+
+#endif
