@@ -86,13 +86,11 @@ void Base::handleController() {
     if(PS3.PS3Connected || PS3.PS3NavigationConnected) {
         if(!controllerConnected) {
             controllerConnected = true;
-            //lcd->setCursor(0, 0);
-            //lcd->print("DS3 Connected   ");
+            lcd->setDS3Connected(true);
         }
         if(PS3.getButtonClick(PS)) {
             PS3.disconnect();
-            //lcd->setCursor(0, 0);
-            //lcd->println("DS3 Disconnected");
+            lcd->setDS3Connected(false);
             return;
         }
         currentDirection = PS3.getAnalogHat(directionalButton);

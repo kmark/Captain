@@ -33,6 +33,7 @@ CaptainLCD::CaptainLCD(unsigned int rs, unsigned int enable, unsigned int d4,
     _thrustLock = false;
     _rxActive = false;
     _direction = 128;
+    _ds3Connected = false;
     pinMode(r, OUTPUT);
     pinMode(g, OUTPUT);
     pinMode(b, OUTPUT);
@@ -53,6 +54,8 @@ void CaptainLCD::begin() {
     LiquidCrystal::write(2);
     LiquidCrystal::setCursor(5, 1);
     LiquidCrystal::write(3);
+    LiquidCrystal::print("      DS3");
+    LiquidCrystal::write(2);
 }
 
 void CaptainLCD::setBacklight(unsigned int r, unsigned int g, unsigned int b) {
@@ -133,4 +136,13 @@ void CaptainLCD::setDirection(unsigned int direction) {
     LiquidCrystal::setCursor(map(direction, 0, 255, 0, 11), 1);
     LiquidCrystal::write(3);
     _direction = direction;
+}
+
+void CaptainLCD::setDS3Connected(bool connected) {
+    if(_ds3Connected == connected) {
+        return;
+    }
+    LiquidCrystal::setCursor(15, 1);
+    LiquidCrystal::write(connected ? 1 : 2);
+    _ds3Connected = connected;
 }

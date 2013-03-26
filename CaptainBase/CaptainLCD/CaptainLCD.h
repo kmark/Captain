@@ -32,6 +32,7 @@ public:
     void setThrustLock(bool);
     void setRxActive(bool);
     void setDirection(unsigned int);
+    void setDS3Connected(bool);
 private:
     void setBacklight(unsigned int, unsigned int, unsigned int);
     unsigned int _rgbPins[3];
@@ -40,6 +41,7 @@ private:
     bool _thrustLock;
     bool _rxActive;
     unsigned int _direction;
+    bool _ds3Connected;
 };
 
 #endif
