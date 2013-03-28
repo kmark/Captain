@@ -128,12 +128,13 @@ void CaptainLCD::setRxActive(bool active) {
 }
 
 void CaptainLCD::setDirection(unsigned int direction) {
+    direction = map(direction, 0, 255, 0, 11);
     if(_direction == direction) {
         return;
     }
-    LiquidCrystal::setCursor(map(_direction, 0, 255, 0, 11), 1);
+    LiquidCrystal::setCursor(_direction, 1);
     LiquidCrystal::print(" ");
-    LiquidCrystal::setCursor(map(direction, 0, 255, 0, 11), 1);
+    LiquidCrystal::setCursor(direction, 1);
     LiquidCrystal::write(3);
     _direction = direction;
 }
