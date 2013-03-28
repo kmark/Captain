@@ -27,10 +27,10 @@ public:
                unsigned int, unsigned int, unsigned int, unsigned int,
                unsigned int);
     void begin();
-    void setGPSActive(bool);
+    bool setGPSActive(bool);
     void setThrust(unsigned int);
     void setThrustLock(bool);
-    void setRxActive(bool);
+    bool setRxActive(bool);
     void setDirection(unsigned int);
     void setDS3Connected(bool);
 private:

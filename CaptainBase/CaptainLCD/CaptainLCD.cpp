@@ -64,9 +64,9 @@ void CaptainLCD::setBacklight(unsigned int r, unsigned int g, unsigned int b) {
     analogWrite(_rgbPins[2], b);
 }
 
-void CaptainLCD::setGPSActive(bool active) {
+bool CaptainLCD::setGPSActive(bool active) {
     if(_gpsActive == active) {
-        return;
+        return false;
     }
     unsigned int symbol = active ? 1 : 2;
     LiquidCrystal::setCursor(15, 0);
@@ -82,6 +82,7 @@ void CaptainLCD::setGPSActive(bool active) {
     else {
         setBacklight(200, 0, 0);
     }
+    return true;
 }
 
 void CaptainLCD::setThrust(unsigned int thrust) {
@@ -106,9 +107,9 @@ void CaptainLCD::setThrustLock(bool locked) {
     _thrustLock = locked;
 }
 
-void CaptainLCD::setRxActive(bool active) {
+bool CaptainLCD::setRxActive(bool active) {
     if(_rxActive == active) {
-        return;
+        return false;
     }
     unsigned int symbol = active ? 1 : 2;
     LiquidCrystal::setCursor(10, 0);
@@ -118,13 +119,14 @@ void CaptainLCD::setRxActive(bool active) {
     if(!active) {
         setGPSActive(false);
         setBacklight(200, 0, 0);
-        return;
+        return true;
     }
     if(_gpsActive) {
         setBacklight(0, 200, 0);
-        return;
+        return true;
     }
     setBacklight(200, 200, 0);
+    return true;
 }
 
 void CaptainLCD::setDirection(unsigned int direction) {
