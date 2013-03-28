@@ -88,6 +88,7 @@ void Base::handleController() {
         if(PS3.getButtonClick(PS)) {
             PS3.disconnect();
             lcd->setDS3Connected(false);
+            ds3Battery = LED1; // Anything other than 4, 7, 9, or 10
             return;
         }
         currentDirection = PS3.getAnalogHat(directionalButton);
@@ -103,6 +104,8 @@ void Base::handleController() {
     }
     else if(controllerConnected) {
         controllerConnected = false;
+        lcd->setDS3Connected(false);
+        ds3Battery = LED1;
     }
 }
 
@@ -221,24 +224,25 @@ bool Base::rxStale() {
 
 void Base::handleInterrupt() {
     interruptCount++;
+    // For time-sensitive data
     if(interruptCount % 50 == 0) {
         bool stale = rxStale();
         lcd->setRxActive(!stale);
-        if(stale || (oldThrust == currentThrust && oldDirection == currentDirection)) {
-            return;
+        if(!stale && (oldThrust != currentThrust || oldDirection != currentDirection)) {
+            oldThrust = currentThrust;
+            oldDirection = currentDirection;
+            XBee->print("$CDT,");
+            Serial.print("$CDT,");
+            XBee->print(currentDirection);
+            Serial.print(currentDirection);
+            XBee->print(',');
+            Serial.print(',');
+            XBee->println(currentThrust);
+            Serial.println(currentThrust);
         }
-        oldThrust = currentThrust;
-        oldDirection = currentDirection;
-        XBee->print("$CDT,");
-        Serial.print("$CDT,");
-        XBee->print(currentDirection);
-        Serial.print(currentDirection);
-        XBee->print(',');
-        Serial.print(',');
-        XBee->println(currentThrust);
-        Serial.println(currentThrust);
     }
-    else if(interruptCount % 500 == 0) {
+    // For things that only need to be run every once in awhile
+    if(interruptCount % 10000 == 0) {
         updateControllerBattery();
     }
 }
