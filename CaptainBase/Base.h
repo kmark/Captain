@@ -42,8 +42,10 @@ private:
     unsigned int currentDirection; // Current direction
     unsigned int oldDirection;
     bool thrustLock; // true if thrust lock is on, false otherwise
+    LED ds3Battery;
 
     void handleController(); // Handles all DS3 inputs
+    void updateControllerBattery();
     
     void handleRx(); // Handles received data from the XBee
     bool rxEncode(char);

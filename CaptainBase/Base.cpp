@@ -83,6 +83,7 @@ void Base::handleController() {
         if(!controllerConnected) {
             controllerConnected = true;
             lcd->setDS3Connected(true);
+            updateControllerBattery();
         }
         if(PS3.getButtonClick(PS)) {
             PS3.disconnect();
@@ -102,6 +103,20 @@ void Base::handleController() {
     }
     else if(controllerConnected) {
         controllerConnected = false;
+    }
+}
+
+void Base::updateControllerBattery() {
+    if(PS3.PS3Connected || PS3.PS3NavigationConnected) {
+        LED batt;
+        if(PS3.getStatus(Dying)) batt = LED4;
+        else if (PS3.getStatus(Low)) batt = LED7;
+        else if (PS3.getStatus(High)) batt = LED9;
+        else if (PS3.getStatus(Full)) batt = LED10;
+        if(ds3Battery != batt) {
+            PS3.setLedOn(batt);
+            ds3Battery = batt;
+        }
     }
 }
 
@@ -222,6 +237,9 @@ void Base::handleInterrupt() {
         Serial.print(',');
         XBee->println(currentThrust);
         Serial.println(currentThrust);
+    }
+    else if(interruptCount % 500 == 0) {
+        updateControllerBattery();
     }
 }
 
