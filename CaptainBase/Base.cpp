@@ -60,10 +60,6 @@ void Base::setup() {
         lcd->print("OSC didn't start!");
         while(1);
     }
-    //lcd->setCursor(0, 0);
-    //lcd->print("Ready for DS3...");
-    //lcd->setCursor(0, 1);
-    //lcd->print("Awaiting XBee...");
 
     interruptCount = 0;
     XBee = &Serial3;
