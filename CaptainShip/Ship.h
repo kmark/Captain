@@ -38,11 +38,28 @@ class Ship {
     unsigned long fixAge;
     float speed; // In knots
     unsigned int interruptCount;
+    bool rxEncode(char);
+    bool rxTermComplete();
+    bool rxInTerm;
+    unsigned int rxBufferOffset;
+    enum { CAPTAIN_SENTENCE_GPS, CAPTAIN_SENTENCE_CDT, CAPTAIN_SENTENCE_UNKNOWN };
+    char rxBuffer[15];
+    unsigned short rxTermNum;
+    byte rxSentenceType;
+    
+    unsigned int thrust;
+    unsigned int direction;
+    bool thrustDirection;
+    
+    SoftwareSerial *XBee;
+    HardwareSerial *gpsSerial;
+    TinyGPS *gps;
 public:
     Ship();
     void setup();
     void loop();
     void handleInterrupt();
+    void handleRx();
 private:
     void handleGPS();
 };

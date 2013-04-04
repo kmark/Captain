@@ -17,23 +17,27 @@
 
 #include "Ship.h"
 
-TinyGPS gps;
-SoftwareSerial gpsSerial(14, 15);
 Ship* shipInstance = NULL; // Used for interrupts
 
 Ship::Ship() : latitude(TinyGPS::GPS_INVALID_F_ANGLE),
  longitude(TinyGPS::GPS_INVALID_F_ANGLE), fixAge(TinyGPS::GPS_INVALID_AGE),
  speed(TinyGPS::GPS_INVALID_F_SPEED), interruptCount(0) {
      shipInstance = this;
+     thrust = 0;
+     direction = 128;
+     thrustDirection = true;
+     gps = new TinyGPS();
+     gpsSerial = &Serial;
+     XBee = new SoftwareSerial(18, 19);
 }
 
 void Ship::setup() {
-    Serial.begin(19200); // XBee
-    gpsSerial.begin(9600);
+    XBee->begin(19200);
+    gpsSerial->begin(9600);
     // GPRMC data only
-    gpsSerial.println(PMTK_SET_NMEA_OUTPUT_RMCONLY);
+    gpsSerial->println(PMTK_SET_NMEA_OUTPUT_RMCONLY);
     // Update once per second (1Hz)
-    gpsSerial.println(PMTK_SET_NMEA_UPDATE_1HZ);
+    gpsSerial->println(PMTK_SET_NMEA_UPDATE_1HZ);
     
     /* Initialize the data output interrupt. It'll fire every millisecond
      * * Timer2 is 8-bits wide, so it can count to 255
@@ -54,14 +58,21 @@ void Ship::setup() {
 
 void Ship::loop() {
     handleGPS();
+    handleRx();
 }
 
 void Ship::handleGPS() {
-    while(gpsSerial.available()) {
-       if(gps.encode(gpsSerial.read())) {
-           gps.f_get_position(&latitude, &longitude, &fixAge);
-           speed = gps.f_speed_knots();
+    while(gpsSerial->available()) {
+       if(gps->encode(gpsSerial->read())) {
+           gps->f_get_position(&latitude, &longitude, &fixAge);
+           speed = gps->f_speed_knots();
         }
+    }
+}
+
+void Ship::handleRx() {
+    while(XBee->available()) {
+        rxEncode(XBee->read());
     }
 }
 
@@ -72,17 +83,69 @@ void Ship::handleInterrupt() {
     if(interruptCount > 999) {
         interruptCount = 0;
         // Push GPS data
-        Serial.print("$GPS,");
-        Serial.print(fixAge == TinyGPS::GPS_INVALID_AGE ? "V" : "A");
-        Serial.print(",");
-        Serial.print(latitude, 10);
-        Serial.print(",");
-        Serial.print(longitude, 10);
-        Serial.print(",");
-        Serial.println(speed, 2);
+        XBee->print("$GPS,");
+        XBee->print(fixAge == TinyGPS::GPS_INVALID_AGE ? "V" : "A");
+        XBee->print(",");
+        XBee->print(latitude, 10);
+        XBee->print(",");
+        XBee->print(longitude, 10);
+        XBee->print(",");
+        XBee->println(speed, 2);
     }
     TCNT2 = 130; // Reset timer to 130 of 255
     TIFR2 = 0; // Clear overflow flag
+}
+
+bool Ship::rxEncode(char c) {
+    bool valid = false;
+    switch(c) {
+        case ',': // term terminators
+        case '\r':
+        case '\n':
+            // Ignores the LF or \n in CR+LF or \r\n terminators
+            if(rxBufferOffset == 0) {
+                return valid;
+            }
+            valid = rxTermComplete();
+            rxBufferOffset = 0;
+            memset(rxBuffer, 0, sizeof(rxBuffer));
+            rxTermNum++;
+            return valid;
+        case '$': // sentence begin
+            rxSentenceType = CAPTAIN_SENTENCE_UNKNOWN;
+            rxTermNum = rxBufferOffset = 0;
+            memset(rxBuffer, 0, sizeof(rxBuffer));
+            return valid;
+    }
+    // Data. Not a $ or terminator. Add it to the buffer.
+    rxBuffer[rxBufferOffset++] = c;
+    return valid;
+}
+
+bool Ship::rxTermComplete() {
+    if(rxTermNum == 0) {
+        if(strcmp(rxBuffer, "CDT") == 0) {
+            rxSentenceType = CAPTAIN_SENTENCE_CDT;
+        }
+    }
+    switch (rxSentenceType) {
+        case CAPTAIN_SENTENCE_CDT:
+            switch(rxTermNum) {
+                case 1:
+                    thrustDirection = rxBuffer[0] == 'F';
+                    break;
+                case 2:
+                    direction = atoi(rxBuffer);
+                    break;
+                case 3:
+                    thrust = atoi(rxBuffer);
+                    break;
+            }
+            break;
+        default:
+            return false;
+    }
+    return true;
 }
 
 ISR(TIMER2_OVF_vect) {
