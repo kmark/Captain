@@ -54,6 +54,11 @@ void Ship::setup() {
     TIFR2 = 0; // Clear overflow flag
     TIMSK2 = 1; // Enable timer compare interrupt
     TCCR2B = 5; // Timer prescaler to 128
+    
+    pinMode(11, OUTPUT); // PWM
+    pinMode(12, OUTPUT); // DIR
+    digitalWrite(12, HIGH);
+    analogWrite(11, 0);
 }
 
 void Ship::loop() {
@@ -133,12 +138,14 @@ bool Ship::rxTermComplete() {
             switch(rxTermNum) {
                 case 1:
                     thrustDirection = rxBuffer[0] == 'F';
+                    digitalWrite(12, thrustDirection ? HIGH : LOW);
                     break;
                 case 2:
                     direction = atoi(rxBuffer);
                     break;
                 case 3:
                     thrust = atoi(rxBuffer);
+                    analogWrite(11, thrust);
                     break;
             }
             break;
