@@ -38,9 +38,12 @@ private:
     Button thrustButton; // Analog button to use for thrust control
     AnalogHat directionalButton; // Joystick used for directional control
     unsigned int currentThrust; // Current thrust
+    Button thrustDirectionButton; // Button to use for forward/reverse change
+    bool thrustDirection; // true if forward, false if reverse
     unsigned int oldThrust;
     unsigned int currentDirection; // Current direction
     unsigned int oldDirection;
+    bool oldThrustDirection;
     bool thrustLock; // true if thrust lock is on, false otherwise
     LED ds3Battery;
 

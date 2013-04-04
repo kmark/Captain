@@ -30,6 +30,7 @@ public:
     bool setGPSActive(bool);
     void setThrust(unsigned int);
     void setThrustLock(bool);
+    void setThrustDirection(bool);
     bool setRxActive(bool);
     void setDirection(unsigned int);
     void setDS3Connected(bool);
@@ -39,6 +40,7 @@ private:
     bool _gpsActive;
     unsigned int _thrust;
     bool _thrustLock;
+    bool _thrustDirection;
     bool _rxActive;
     unsigned int _direction;
     bool _ds3Connected;

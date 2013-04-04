@@ -37,12 +37,15 @@ void Base::setup() {
     controllerConnected = false;
     stickSensitivity = 3;
     thrustLockButton = CIRCLE;
+    thrustDirectionButton = SQUARE;
+    thrustDirection = true;
     thrustButton = R2;
     directionalButton = LeftHatX;
     currentThrust = 0;
     oldThrust = 1;
     currentDirection = 128;
     oldDirection = 1;
+    oldThrustDirection = false;
     thrustLock = false;
     
     rxTermNum = 0;
@@ -100,6 +103,10 @@ void Base::handleController() {
         if(PS3.getButtonClick(thrustLockButton)) {
             thrustLock = !thrustLock;
             lcd->setThrustLock(thrustLock);
+        }
+        if(PS3.getButtonClick(thrustDirectionButton)) {
+            thrustDirection = !thrustDirection;
+            lcd->setThrustDirection(thrustDirection);
         }
     }
     else if(controllerConnected) {
@@ -228,11 +235,18 @@ void Base::handleInterrupt() {
     if(interruptCount % 50 == 0) {
         bool stale = rxStale();
         lcd->setRxActive(!stale);
-        if(!stale && (oldThrust != currentThrust || oldDirection != currentDirection)) {
+        if(!stale && (oldThrust != currentThrust ||
+                      oldDirection != currentDirection ||
+                      oldThrustDirection != thrustDirection)) {
             oldThrust = currentThrust;
             oldDirection = currentDirection;
+            oldThrustDirection = thrustDirection;
             XBee->print("$CDT,");
             Serial.print("$CDT,");
+            XBee->print(thrustDirection ? 'F' : 'R');
+            Serial.print(thrustDirection ? 'F' : 'R');
+            XBee->print(',');
+            Serial.print(',');
             XBee->print(currentDirection);
             Serial.print(currentDirection);
             XBee->print(',');

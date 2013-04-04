@@ -31,6 +31,7 @@ CaptainLCD::CaptainLCD(unsigned int rs, unsigned int enable, unsigned int d4,
     _gpsActive = false;
     _thrust = 0;
     _thrustLock = false;
+    _thrustDirection = true;
     _rxActive = false;
     _direction = 128;
     _ds3Connected = false;
@@ -48,7 +49,7 @@ void CaptainLCD::begin() {
     LiquidCrystal::clear();
     setBacklight(200, 0, 0);
     LiquidCrystal::setCursor(0, 0);
-    LiquidCrystal::print("T  0% U RX");
+    LiquidCrystal::print("F  0% U RX");
     LiquidCrystal::write(2);
     LiquidCrystal::print(" GPS");
     LiquidCrystal::write(2);
@@ -105,6 +106,16 @@ void CaptainLCD::setThrustLock(bool locked) {
     LiquidCrystal::setCursor(6, 0);
     LiquidCrystal::print(text);
     _thrustLock = locked;
+}
+
+void CaptainLCD::setThrustDirection(bool thrustDir) {
+    if(_thrustDirection == thrustDir) {
+        return;
+    }
+    char text = thrustDir ? 'F' : 'R';
+    LiquidCrystal::setCursor(0, 0);
+    LiquidCrystal::print(text);
+    _thrustDirection = thrustDir;
 }
 
 bool CaptainLCD::setRxActive(bool active) {
