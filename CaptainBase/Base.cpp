@@ -135,7 +135,9 @@ void Base::handleRx() {
         char lolz = Serial3.read();
         Serial.write(lolz);
         if(rxEncode(lolz)) {
-            lcd->setGPSActive(rxActive);
+            if(lcd->setGPSActive(rxActive) && controllerConnected) {
+                PS3.setRumbleOn(25, 255, 0, 0);
+            };
         }
     }
 }
@@ -234,7 +236,9 @@ void Base::handleInterrupt() {
     // For time-sensitive data
     if(interruptCount % 50 == 0) {
         bool stale = rxStale();
-        lcd->setRxActive(!stale);
+        if(lcd->setRxActive(!stale) && controllerConnected) {
+            PS3.setRumbleOn(25, 255, 0, 0);
+        }
         if(!stale && (oldThrust != currentThrust ||
                       oldDirection != currentDirection ||
                       oldThrustDirection != thrustDirection)) {
