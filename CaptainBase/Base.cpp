@@ -99,14 +99,14 @@ void Base::handleController() {
         if(!thrustLock) {
             currentThrust = PS3.getAnalogButton(thrustButton);
             lcd->setThrust(currentThrust);
+            if(PS3.getButtonClick(thrustDirectionButton)) {
+                thrustDirection = !thrustDirection;
+                lcd->setThrustDirection(thrustDirection);
+            }
         }
         if(PS3.getButtonClick(thrustLockButton)) {
             thrustLock = !thrustLock;
             lcd->setThrustLock(thrustLock);
-        }
-        if(PS3.getButtonClick(thrustDirectionButton)) {
-            thrustDirection = !thrustDirection;
-            lcd->setThrustDirection(thrustDirection);
         }
     }
     else if(controllerConnected) {
