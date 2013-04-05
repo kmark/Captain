@@ -21,6 +21,7 @@
 #include "Arduino.h"
 #include "SoftwareSerial.h"
 #include "TinyGPS.h"
+#include "Servo.h"
 #include "avr/io.h"
 #include "avr/interrupt.h"
 
@@ -54,6 +55,7 @@ class Ship {
     SoftwareSerial *XBee;
     HardwareSerial *gpsSerial;
     TinyGPS *gps;
+    Servo *rudder;
 public:
     Ship();
     void setup();

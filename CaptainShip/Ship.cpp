@@ -29,6 +29,7 @@ Ship::Ship() : latitude(TinyGPS::GPS_INVALID_F_ANGLE),
      gps = new TinyGPS();
      gpsSerial = &Serial;
      XBee = new SoftwareSerial(18, 19);
+     rudder = new Servo();
 }
 
 void Ship::setup() {
@@ -57,7 +58,8 @@ void Ship::setup() {
     
     pinMode(12, OUTPUT); // DIR
     digitalWrite(12, HIGH);
-    analogWrite(10, 0);
+    analogWrite(5, 0);
+    rudder->attach(9);
 }
 
 void Ship::loop() {
@@ -142,11 +144,12 @@ bool Ship::rxTermComplete() {
                 case 2:
                     rxBuffer[rxBufferOffset] = 0x00;
                     direction = atoi(rxBuffer);
+                    rudder->write(map(direction, 0, 255, 0, 180));
                     break;
                 case 3:
                     rxBuffer[rxBufferOffset] = 0x00;
                     thrust = atoi(rxBuffer);
-                    analogWrite(10, thrust);
+                    analogWrite(5, thrust);
                     break;
             }
             break;
