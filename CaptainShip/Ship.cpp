@@ -141,9 +141,11 @@ bool Ship::rxTermComplete() {
                     digitalWrite(12, thrustDirection ? HIGH : LOW);
                     break;
                 case 2:
+                    rxBuffer[rxBufferOffset] = 0x00;
                     direction = atoi(rxBuffer);
                     break;
                 case 3:
+                    rxBuffer[rxBufferOffset] = 0x00;
                     thrust = atoi(rxBuffer);
                     analogWrite(11, thrust);
                     break;
