@@ -55,10 +55,9 @@ void Ship::setup() {
     TIMSK2 = 1; // Enable timer compare interrupt
     TCCR2B = 5; // Timer prescaler to 128
     
-    pinMode(11, OUTPUT); // PWM
     pinMode(12, OUTPUT); // DIR
     digitalWrite(12, HIGH);
-    analogWrite(11, 0);
+    analogWrite(10, 0);
 }
 
 void Ship::loop() {
@@ -147,7 +146,7 @@ bool Ship::rxTermComplete() {
                 case 3:
                     rxBuffer[rxBufferOffset] = 0x00;
                     thrust = atoi(rxBuffer);
-                    analogWrite(11, thrust);
+                    analogWrite(10, thrust);
                     break;
             }
             break;
