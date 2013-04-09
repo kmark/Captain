@@ -18,6 +18,9 @@ Hardware
 * 1x [Fastrax UP501 GPS Receiver][GPS]
 * 1x [16x2 Character LCD - RGB Backlight][LCD]
 * 1x [PS3 DualShock 3 Controller][DS3]
+* 1x [Futaba S3003 Servo][S3003]
+* 1x [Pololu High-Power Motor Driver 18v15][PololuDriver]
+* 1x 12V Brushed DC Motor (We pulled one from a cordless drill)
 
 
 [ArduinoUno]: https://www.sparkfun.com/products/11021
@@ -29,3 +32,5 @@ Hardware
 [GPS]: https://www.sparkfun.com/products/10702
 [LCD]: https://www.sparkfun.com/products/10862
 [DS3]: http://www.amazon.com/dp/B0015AARJI
+[S3003]: http://www.gpdealera.com/cgi-bin/wgainf100p.pgm?I=FUTM0031
+[PololuDriver]: http://www.pololu.com/catalog/product/755
