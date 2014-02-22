@@ -34,18 +34,18 @@ public:
 private:
     bool controllerConnected; // true if controller is connected, false otherwise
     int stickSensitivity; // Prevents servo convulsions
-    Button thrustLockButton; // Button to use for thrust locking
-    Button thrustButton; // Analog button to use for thrust control
-    AnalogHat directionalButton; // Joystick used for directional control
+    ButtonEnum thrustLockButton; // Button to use for thrust locking
+    ButtonEnum thrustButton; // Analog button to use for thrust control
+    AnalogHatEnum directionalButton; // Joystick used for directional control
     unsigned int currentThrust; // Current thrust
-    Button thrustDirectionButton; // Button to use for forward/reverse change
+    ButtonEnum thrustDirectionButton; // Button to use for forward/reverse change
     bool thrustDirection; // true if forward, false if reverse
     unsigned int oldThrust;
     unsigned int currentDirection; // Current direction
     unsigned int oldDirection;
     bool oldThrustDirection;
     bool thrustLock; // true if thrust lock is on, false otherwise
-    LED ds3Battery;
+    LEDEnum ds3Battery;
 
     void handleController(); // Handles all DS3 inputs
     void updateControllerBattery();

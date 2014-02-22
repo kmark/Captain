@@ -118,7 +118,7 @@ void Base::handleController() {
 
 void Base::updateControllerBattery() {
     if(PS3.PS3Connected || PS3.PS3NavigationConnected) {
-        LED batt;
+        LEDEnum batt;
         if(PS3.getStatus(Dying)) batt = LED4;
         else if (PS3.getStatus(Low)) batt = LED7;
         else if (PS3.getStatus(High)) batt = LED9;
