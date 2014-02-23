@@ -33,6 +33,7 @@ namespace config {
     const ButtonEnum thrustDirectionButton = SQUARE; // Button to use for forward/reverse change
     const AnalogHatEnum directionalButton = LeftHatX; // Joystick used for directional control
     
+    // See CaptainLCD/CaptainLCD.h for static LCD configuration
     
     // Nothing to configure below
 #ifdef USE_PS3BT

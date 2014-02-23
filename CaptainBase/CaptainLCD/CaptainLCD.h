@@ -21,6 +21,13 @@
 #include "LiquidCrystal.h"
 #include "Arduino.h"
 
+namespace config {
+    const unsigned int backlightNoRx[3] = { 200, 0, 0 }; // R,G,B when there is no connection
+    const unsigned int backlightNoGps[3] = { 200, 200, 0 }; // When there is a connection but no GPS
+    const unsigned int backlightIdeal[3] = { 0, 200, 0 }; // When an ideal connection is present
+    const unsigned int backlightOff[3] = { 0, 0, 0 }; // Off
+}
+
 class CaptainLCD : public LiquidCrystal {
 public:
     CaptainLCD(unsigned int, unsigned int, unsigned int, unsigned int,
@@ -35,7 +42,7 @@ public:
     void setDirection(unsigned int);
     void setDS3Connected(bool);
 private:
-    void setBacklight(unsigned int, unsigned int, unsigned int);
+    void setBacklight(const unsigned int rgb[3]);
     unsigned int _rgbPins[3];
     bool _gpsActive;
     unsigned int _thrust;

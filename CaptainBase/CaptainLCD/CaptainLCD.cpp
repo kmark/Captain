@@ -41,13 +41,13 @@ CaptainLCD::CaptainLCD(unsigned int rs, unsigned int enable, unsigned int d4,
     _rgbPins[0] = r;
     _rgbPins[1] = g;
     _rgbPins[2] = b;
-    setBacklight(0, 0, 0);
+    setBacklight(config::backlightOff);
 }
 
 void CaptainLCD::begin() {
     LiquidCrystal::begin(16, 2);
     LiquidCrystal::clear();
-    setBacklight(200, 0, 0);
+    setBacklight(config::backlightNoRx);
     LiquidCrystal::setCursor(0, 0);
     LiquidCrystal::print("F  0% U RX");
     LiquidCrystal::write(2);
@@ -59,10 +59,10 @@ void CaptainLCD::begin() {
     LiquidCrystal::write(2);
 }
 
-void CaptainLCD::setBacklight(unsigned int r, unsigned int g, unsigned int b) {
-    analogWrite(_rgbPins[0], r);
-    analogWrite(_rgbPins[1], g);
-    analogWrite(_rgbPins[2], b);
+void CaptainLCD::setBacklight(const unsigned int rgb[3]) {
+    analogWrite(_rgbPins[0], rgb[0]);
+    analogWrite(_rgbPins[1], rgb[1]);
+    analogWrite(_rgbPins[2], rgb[2]);
 }
 
 bool CaptainLCD::setGPSActive(bool active) {
@@ -74,14 +74,14 @@ bool CaptainLCD::setGPSActive(bool active) {
     LiquidCrystal::write(symbol);
     _gpsActive = active;
     if(_rxActive && _gpsActive) {
-        setBacklight(0, 200, 0);
+        setBacklight(config::backlightIdeal);
     }
     else if(_rxActive) {
-        setBacklight(200, 200, 0);
+        setBacklight(config::backlightNoGps);
         
     }
     else {
-        setBacklight(200, 0, 0);
+        setBacklight(config::backlightNoRx);
     }
     return true;
 }
@@ -129,14 +129,14 @@ bool CaptainLCD::setRxActive(bool active) {
     // If our Rx is inactive then our GPS can't be active either
     if(!active) {
         setGPSActive(false);
-        setBacklight(200, 0, 0);
+        setBacklight(config::backlightNoRx);
         return true;
     }
     if(_gpsActive) {
-        setBacklight(0, 200, 0);
+        setBacklight(config::backlightIdeal);
         return true;
     }
-    setBacklight(200, 200, 0);
+    setBacklight(config::backlightNoGps);
     return true;
 }
 
