@@ -17,10 +17,30 @@
 
 #ifndef _CaptainBase_h
 #define _CaptainBase_h
-#define USEPS3BT // Comment out to use direct USB
 
 #include "Arduino.h"
 #include "Base.h"
+
+// Conditional compilation
+#define USE_PS3BT // Comment out to use direct USB
+//
+
+namespace config {
+    const bool gps = true; // If the Ship module has a GPS onboard
+    const unsigned int stickSensitivity = 3; // Prevents servo convulsions
+    const ButtonEnum thrustLockButton = CIRCLE; // Button to use for thrust locking
+    const ButtonEnum thrustButton = R2; // Analog button to use for thrust control
+    const ButtonEnum thrustDirectionButton = SQUARE; // Button to use for forward/reverse change
+    const AnalogHatEnum directionalButton = LeftHatX; // Joystick used for directional control
+    
+    
+    // Nothing to configure below
+#ifdef USE_PS3BT
+    const bool bluetooth = true;
+#else
+    const bool bluetooth = false;
+#endif
+}
 
 void setup();
 void loop();

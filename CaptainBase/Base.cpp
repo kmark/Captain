@@ -20,7 +20,7 @@
 
 // I'd really like to move this into the Base class somehow...
 USB Usb;
-#ifdef USEPS3BT
+#ifdef USE_PS3BT
     BTD Btd(&Usb);
     PS3BT PS3(&Btd);
 #else
@@ -35,12 +35,7 @@ void Base::setup() {
     lcd->begin();
     
     controllerConnected = false;
-    stickSensitivity = 3;
-    thrustLockButton = CIRCLE;
-    thrustDirectionButton = SQUARE;
     thrustDirection = true;
-    thrustButton = R2;
-    directionalButton = LeftHatX;
     currentThrust = 0;
     oldThrust = 1;
     currentDirection = 128;
@@ -89,22 +84,24 @@ void Base::handleController() {
             updateControllerBattery();
         }
         if(PS3.getButtonClick(PS)) {
+#ifdef USE_PS3BT
             PS3.disconnect();
+#endif
             lcd->setDS3Connected(false);
             ds3Battery = LED1; // Anything other than 4, 7, 9, or 10
             return;
         }
-        currentDirection = PS3.getAnalogHat(directionalButton);
+        currentDirection = PS3.getAnalogHat(config::directionalButton);
         lcd->setDirection(currentDirection);
         if(!thrustLock) {
-            currentThrust = PS3.getAnalogButton(thrustButton);
+            currentThrust = PS3.getAnalogButton(config::thrustButton);
             lcd->setThrust(currentThrust);
-            if(PS3.getButtonClick(thrustDirectionButton)) {
+            if(PS3.getButtonClick(config::thrustDirectionButton)) {
                 thrustDirection = !thrustDirection;
                 lcd->setThrustDirection(thrustDirection);
             }
         }
-        if(PS3.getButtonClick(thrustLockButton)) {
+        if(PS3.getButtonClick(config::thrustLockButton)) {
             thrustLock = !thrustLock;
             lcd->setThrustLock(thrustLock);
         }
