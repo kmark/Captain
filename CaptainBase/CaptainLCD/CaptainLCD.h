@@ -32,7 +32,7 @@ class CaptainLCD : public LiquidCrystal {
 public:
     CaptainLCD(unsigned int, unsigned int, unsigned int, unsigned int,
                unsigned int, unsigned int, unsigned int, unsigned int,
-               unsigned int);
+               unsigned int, const bool *);
     void begin();
     bool setGPSActive(bool);
     void setThrust(unsigned int);
@@ -42,7 +42,7 @@ public:
     void setDirection(unsigned int);
     void setDS3Connected(bool);
 private:
-    void setBacklight(const unsigned int rgb[3]);
+    void setBacklight(const unsigned int[3]);
     unsigned int _rgbPins[3];
     bool _gpsActive;
     unsigned int _thrust;
@@ -51,6 +51,7 @@ private:
     bool _rxActive;
     unsigned int _direction;
     bool _ds3Connected;
+    const bool *_gps;
 };
 
 #endif

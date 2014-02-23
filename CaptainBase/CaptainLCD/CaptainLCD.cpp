@@ -23,7 +23,7 @@ byte odot[8] = {0,14,31,27,31,14,0,0};
 
 CaptainLCD::CaptainLCD(unsigned int rs, unsigned int enable, unsigned int d4,
                        unsigned int d5, unsigned int d6, unsigned int d7,
-                       unsigned int r, unsigned int g, unsigned int b)
+                       unsigned int r, unsigned int g, unsigned int b, const bool *gps)
 : LiquidCrystal(rs, enable, d4, d5, d6, d7) {
     LiquidCrystal::createChar(1, check);
     LiquidCrystal::createChar(2, xmark);
@@ -35,6 +35,7 @@ CaptainLCD::CaptainLCD(unsigned int rs, unsigned int enable, unsigned int d4,
     _rxActive = false;
     _direction = 128;
     _ds3Connected = false;
+    _gps = gps;
     pinMode(r, OUTPUT);
     pinMode(g, OUTPUT);
     pinMode(b, OUTPUT);
@@ -73,7 +74,7 @@ bool CaptainLCD::setGPSActive(bool active) {
     LiquidCrystal::setCursor(15, 0);
     LiquidCrystal::write(symbol);
     _gpsActive = active;
-    if(_rxActive && _gpsActive) {
+    if(_rxActive && (_gpsActive || !*_gps)) {
         setBacklight(config::backlightIdeal);
     }
     else if(_rxActive) {
@@ -132,7 +133,7 @@ bool CaptainLCD::setRxActive(bool active) {
         setBacklight(config::backlightNoRx);
         return true;
     }
-    if(_gpsActive) {
+    if(_gpsActive || !*_gps) {
         setBacklight(config::backlightIdeal);
         return true;
     }

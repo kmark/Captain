@@ -31,7 +31,7 @@ USB Usb;
 Base *baseInstance = NULL;
 
 void Base::setup() {
-    lcd = new CaptainLCD(62, 63, 64, 65, 66, 67, 61, 68, 69);
+    lcd = new CaptainLCD(62, 63, 64, 65, 66, 67, 61, 68, 69, &config::gps);
     lcd->begin();
     
     controllerConnected = false;
