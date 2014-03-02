@@ -23,6 +23,7 @@
 
 // Conditional compilation
 #define USE_PS3BT // Comment out to use direct USB
+#define XBEE_SERIAL Serial3 // Arduino HardwareSerial to use, set baud below
 //
 
 namespace config {
@@ -32,6 +33,8 @@ namespace config {
     const ButtonEnum thrustButton = R2; // Analog button to use for thrust control
     const ButtonEnum thrustDirectionButton = SQUARE; // Button to use for forward/reverse change
     const AnalogHatEnum directionalButton = LeftHatX; // Joystick used for directional control
+    const unsigned int xbeeBaud = 19200; // XBee baud
+    const uint8_t lcdPins[] = { 62, 63, 64, 65, 66, 67, 61, 68, 69 }; // rs, enable, d4, d5, d6, d7, r, g, b
     
     // See CaptainLCD/CaptainLCD.h for static LCD configuration
     

@@ -21,9 +21,9 @@ byte check[8] = {0,1,3,22,28,8,0,0};
 byte xmark[8] = {0,27,14,4,14,27,0,0};
 byte odot[8] = {0,14,31,27,31,14,0,0};
 
-CaptainLCD::CaptainLCD(unsigned int rs, unsigned int enable, unsigned int d4,
-                       unsigned int d5, unsigned int d6, unsigned int d7,
-                       unsigned int r, unsigned int g, unsigned int b, const bool *gps)
+CaptainLCD::CaptainLCD(uint8_t rs, uint8_t enable, uint8_t d4,
+                       uint8_t d5, uint8_t d6, uint8_t d7,
+                       uint8_t r, uint8_t g, uint8_t b, const bool *gps)
 : LiquidCrystal(rs, enable, d4, d5, d6, d7) {
     LiquidCrystal::createChar(1, check);
     LiquidCrystal::createChar(2, xmark);
@@ -60,7 +60,7 @@ void CaptainLCD::begin() {
     LiquidCrystal::write(2);
 }
 
-void CaptainLCD::setBacklight(const unsigned int rgb[3]) {
+void CaptainLCD::setBacklight(const uint8_t rgb[3]) {
     analogWrite(_rgbPins[0], rgb[0]);
     analogWrite(_rgbPins[1], rgb[1]);
     analogWrite(_rgbPins[2], rgb[2]);

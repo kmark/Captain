@@ -22,17 +22,17 @@
 #include "Arduino.h"
 
 namespace config {
-    const unsigned int backlightNoRx[3] = { 200, 0, 0 }; // R,G,B when there is no connection
-    const unsigned int backlightNoGps[3] = { 200, 200, 0 }; // When there is a connection but no GPS
-    const unsigned int backlightIdeal[3] = { 0, 200, 0 }; // When an ideal connection is present
-    const unsigned int backlightOff[3] = { 0, 0, 0 }; // Off
+    const uint8_t backlightNoRx[3] = { 200, 0, 0 }; // R,G,B when there is no connection
+    const uint8_t backlightNoGps[3] = { 200, 200, 0 }; // When there is a connection but no GPS
+    const uint8_t backlightIdeal[3] = { 0, 200, 0 }; // When an ideal connection is present
+    const uint8_t backlightOff[3] = { 0, 0, 0 }; // Off
 }
 
 class CaptainLCD : public LiquidCrystal {
 public:
-    CaptainLCD(unsigned int, unsigned int, unsigned int, unsigned int,
-               unsigned int, unsigned int, unsigned int, unsigned int,
-               unsigned int, const bool *);
+    CaptainLCD(uint8_t, uint8_t, uint8_t, uint8_t,
+               uint8_t, uint8_t, uint8_t, uint8_t,
+               uint8_t, const bool *);
     void begin();
     bool setGPSActive(bool);
     void setThrust(unsigned int);
@@ -42,8 +42,8 @@ public:
     void setDirection(unsigned int);
     void setDS3Connected(bool);
 private:
-    void setBacklight(const unsigned int[3]);
-    unsigned int _rgbPins[3];
+    void setBacklight(const uint8_t[3]);
+    uint8_t _rgbPins[3];
     bool _gpsActive;
     unsigned int _thrust;
     bool _thrustLock;

@@ -31,7 +31,11 @@ USB Usb;
 Base *baseInstance = NULL;
 
 void Base::setup() {
-    lcd = new CaptainLCD(62, 63, 64, 65, 66, 67, 61, 68, 69, &config::gps);
+    lcd = new CaptainLCD(config::lcdPins[0], config::lcdPins[1],
+                         config::lcdPins[2], config::lcdPins[3],
+                         config::lcdPins[4], config::lcdPins[5],
+                         config::lcdPins[6], config::lcdPins[7],
+                         config::lcdPins[8], &config::gps);
     lcd->begin();
     
     controllerConnected = false;
@@ -52,7 +56,6 @@ void Base::setup() {
     rxLastTerm = 5000;
     
     Serial.begin(115200);
-    Serial3.begin(19200);
 
     if(Usb.Init() == -1) {
         lcd->print("OSC didn't start!");
@@ -60,7 +63,8 @@ void Base::setup() {
     }
 
     interruptCount = 0;
-    XBee = &Serial3;
+    XBee = &XBEE_SERIAL;
+    XBee->begin(config::xbeeBaud);
     baseInstance = this;
     TCCR2A = 0; // Wave gen mode normal
     TCCR2B = 0; // Disable
