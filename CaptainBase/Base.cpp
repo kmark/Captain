@@ -45,9 +45,9 @@ void Base::setup() {
     
     rxTermNum = 0;
     rxSentenceType = CAPTAIN_SENTENCE_UNKNOWN;
-    rxSpeed = NULL;
-    rxLatitude = NULL;
-    rxLongitude = NULL;
+    rxSpeed = "";
+    rxLatitude = "";
+    rxLongitude = "";
     rxActive = false;
     rxLastTerm = 5000;
     
