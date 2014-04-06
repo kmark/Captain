@@ -27,7 +27,7 @@
 //
 
 namespace config {
-    const bool gps = true; // If the Ship module has a GPS onboard
+    const bool gps = false; // If the Ship module has a GPS onboard
     const unsigned int stickSensitivity = 3; // Prevents servo convulsions
     const ButtonEnum thrustLockButton = CIRCLE; // Button to use for thrust locking
     const ButtonEnum thrustButton = R2; // Analog button to use for thrust control

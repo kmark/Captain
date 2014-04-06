@@ -23,14 +23,24 @@
 #include "PS3USB.h"
 #include "CaptainBase.h"
 #include "CaptainLCD.h"
+#include "Bee.h"
 #include "avr/io.h"
 #include "avr/interrupt.h"
 
+void xbeeCallback(BeePointerFrame *frame);
+
+namespace CaptainFrames {
+    static const uint8_t GPS = 0x47;
+    static const uint8_t CDT = 0x44;
+}
+
 class Base {
 public:
+    Base();
     void setup();
     void loop();
     void handleInterrupt();
+    void handleRx(BeePointerFrame *); // Handles received data from the XBee
 private:
     bool controllerConnected; // true if controller is connected, false otherwise
     unsigned int currentThrust; // Current thrust
@@ -44,25 +54,15 @@ private:
 
     void handleController(); // Handles all DS3 inputs
     void updateControllerBattery();
-    
-    void handleRx(); // Handles received data from the XBee
-    bool rxEncode(char);
-    bool rxTermComplete();
-    bool rxInTerm;
-    unsigned short rxTermNum;
-    byte rxSentenceType;
-    char rxBuffer[15];
-    unsigned int rxBufferOffset;
-    enum { CAPTAIN_SENTENCE_GPS, CAPTAIN_SENTENCE_CDT, CAPTAIN_SENTENCE_UNKNOWN };
+
     String rxLatitude;
     String rxLongitude;
     bool rxActive;
     unsigned long rxLastTerm;
     String rxSpeed;
-    void rxSendTerm(int, char[][15], int);
     bool rxStale();
     unsigned int interruptCount;
-    HardwareSerial *XBee;
+    Bee XBee;
     CaptainLCD *lcd;
 };
 

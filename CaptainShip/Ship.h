@@ -22,6 +22,7 @@
 #include "SoftwareSerial.h"
 #include "TinyGPS.h"
 #include "Servo.h"
+#include "Bee.h"
 #include "avr/io.h"
 #include "avr/interrupt.h"
 
@@ -32,6 +33,12 @@
 #define PMTK_SET_NMEA_OUTPUT_RMCONLY "$PMTK314,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0*29"
 #define PMTK_SET_NMEA_OUTPUT_ALLDATA "$PMTK314,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0*28"
 
+void xbeeCallback(BeePointerFrame *frame);
+
+namespace CaptainFrames {
+    static const uint8_t GPS = 0x47;
+    static const uint8_t CDT = 0x44;
+}
 
 class Ship {
     float latitude;
@@ -39,20 +46,13 @@ class Ship {
     unsigned long fixAge;
     float speed; // In knots
     unsigned int interruptCount;
-    bool rxEncode(char);
-    bool rxTermComplete();
-    bool rxInTerm;
-    unsigned int rxBufferOffset;
-    enum { CAPTAIN_SENTENCE_GPS, CAPTAIN_SENTENCE_CDT, CAPTAIN_SENTENCE_UNKNOWN };
-    char rxBuffer[15];
-    unsigned short rxTermNum;
-    byte rxSentenceType;
-    
+
     unsigned int thrust;
     unsigned int direction;
     bool thrustDirection;
-    
-    SoftwareSerial *XBee;
+
+    //SoftwareSerial *XBee;
+    Bee XBee;
     HardwareSerial *gpsSerial;
     TinyGPS *gps;
     Servo *rudder;
@@ -61,7 +61,7 @@ public:
     void setup();
     void loop();
     void handleInterrupt();
-    void handleRx();
+    void handleRx(BeePointerFrame *frame);
 private:
     void handleGPS();
 };

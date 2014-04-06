@@ -30,6 +30,10 @@ USB Usb;
 //CaptainLCD lcd(62, 63, 64, 65, 66, 67);
 Base *baseInstance = NULL;
 
+Base::Base() : XBee(Bee(&XBEE_SERIAL, config::xbeeBaud)) {
+    //
+}
+
 void Base::setup() {
     lcd = new CaptainLCD(config::lcdPins[0], config::lcdPins[1],
                          config::lcdPins[2], config::lcdPins[3],
@@ -37,7 +41,7 @@ void Base::setup() {
                          config::lcdPins[6], config::lcdPins[7],
                          config::lcdPins[8], &config::gps);
     lcd->begin();
-    
+
     controllerConnected = false;
     thrustDirection = true;
     currentThrust = 0;
@@ -46,15 +50,13 @@ void Base::setup() {
     oldDirection = 1;
     oldThrustDirection = false;
     thrustLock = false;
-    
-    rxTermNum = 0;
-    rxSentenceType = CAPTAIN_SENTENCE_UNKNOWN;
+
     rxSpeed = "";
     rxLatitude = "";
     rxLongitude = "";
     rxActive = false;
     rxLastTerm = 5000;
-    
+
     Serial.begin(115200);
 
     if(Usb.Init() == -1) {
@@ -63,8 +65,6 @@ void Base::setup() {
     }
 
     interruptCount = 0;
-    XBee = &XBEE_SERIAL;
-    XBee->begin(config::xbeeBaud);
     baseInstance = this;
     TCCR2A = 0; // Wave gen mode normal
     TCCR2B = 0; // Disable
@@ -72,11 +72,14 @@ void Base::setup() {
     TIFR2 = 0; // Clear overflow flag
     TIMSK2 = 1; // Enable timer compare interrupt
     TCCR2B = 5; // Timer prescaler to 128
+
+    XBee.setCallback(xbeeCallback);
+    XBee.begin();
 }
 
 void Base::loop() {
     handleController();
-    handleRx();
+    XBee.tick();
 }
 
 void Base::handleController() {
@@ -131,94 +134,17 @@ void Base::updateControllerBattery() {
     }
 }
 
-void Base::handleRx() {
-    while(Serial3.available()) {
-        char lolz = Serial3.read();
-        Serial.write(lolz);
-        if(rxEncode(lolz)) {
-            if(lcd->setGPSActive(rxActive) && controllerConnected) {
-                PS3.setRumbleOn(25, 255, 0, 0);
-            };
-        }
-    }
-}
-
-// The below will probably be put into some kind
-// of "CaptainCommunication" library...
-// Based on NMEA and TinyGPS
-
-bool Base::rxEncode(char c) {
-    bool valid = false;
-    switch(c) {
-        case ',': // term terminators
-        case '\r':
-        case '\n':
-            // Ignores the LF or \n in CR+LF or \r\n terminators
-            if(rxBufferOffset == 0) {
-                return valid;
-            }
-            valid = rxTermComplete();
-            rxBufferOffset = 0;
-            memset(rxBuffer, 0, sizeof(rxBuffer));
-            rxTermNum++;
-            return valid;
-        case '$': // sentence begin
-            rxSentenceType = CAPTAIN_SENTENCE_UNKNOWN;
-            rxTermNum = rxBufferOffset = 0;
-            memset(rxBuffer, 0, sizeof(rxBuffer));
-            return valid;
-    }
-    // Data. Not a $ or terminator. Add it to the buffer.
-    rxBuffer[rxBufferOffset++] = c;
-    return valid;
-}
-
-bool Base::rxTermComplete() {
+void Base::handleRx(BeePointerFrame *frame) {
     rxLastTerm = millis();
-    if(rxTermNum == 0) {
-        if(!strcmp(rxBuffer, "GPS")) {
-            rxSentenceType = CAPTAIN_SENTENCE_GPS;
-        }
-    }
-    switch (rxSentenceType) {
-        case CAPTAIN_SENTENCE_GPS:
-            switch(rxTermNum) {
-                case 1:
-                    rxActive = rxBuffer[0] == 'A';
-                    break;
-                case 2:
-                    rxLatitude = String(rxBuffer);
-                    break;
-                case 3:
-                    rxLongitude = String(rxBuffer);
-                    break;
-                case 4:
-                    rxSpeed = String(rxBuffer);
-                    break;
-            }
+    switch(frame->data[0]) {
+        case CaptainFrames::GPS:
+            rxActive = frame->data[1] == 'A';
+            // rxLatitude, rxLongitude, and rxSpeed are currently unused
             break;
-        default:
-            return false;
     }
-    return true;
-}
-
-// dsize = sizeof(data)
-void Base::rxSendTerm(int termType, char data[][15], int dsize) {
-    String term = "$";
-    switch(termType) {
-        case CAPTAIN_SENTENCE_CDT:
-            term += "CDT";
-            break;
-        default:
-            return;
+    if(lcd->setGPSActive(rxActive) && controllerConnected) {
+        PS3.setRumbleOn(25, 255, 0, 0);
     }
-    for(int i = 0; i < dsize; i++) {
-        term += ",";
-        term += data[i];
-    }
-    term += "\r\n";
-    XBee->println(term);
 }
 
 // Convenience function
@@ -246,18 +172,19 @@ void Base::handleInterrupt() {
             oldThrust = currentThrust;
             oldDirection = currentDirection;
             oldThrustDirection = thrustDirection;
-            XBee->print("$CDT,");
+
+            char cdt[] = { CaptainFrames::CDT, thrustDirection ? 'F': 'R',
+                currentDirection, currentThrust};
+
+            XBee.sendData(cdt, sizeof cdt);
+
             Serial.print("$CDT,");
-            XBee->print(thrustDirection ? 'F' : 'R');
             Serial.print(thrustDirection ? 'F' : 'R');
-            XBee->print(',');
             Serial.print(',');
-            XBee->print(currentDirection);
             Serial.print(currentDirection);
-            XBee->print(',');
             Serial.print(',');
-            XBee->println(currentThrust);
             Serial.println(currentThrust);
+
         }
     }
     // For things that only need to be run every once in awhile
@@ -268,4 +195,8 @@ void Base::handleInterrupt() {
 
 ISR(TIMER2_OVF_vect) {
     baseInstance->handleInterrupt();
+}
+
+void xbeeCallback(BeePointerFrame *frame) {
+    baseInstance->handleRx(frame);
 }

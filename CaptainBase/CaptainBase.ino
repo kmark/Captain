@@ -19,3 +19,4 @@
 #include "PS3BT.h"
 #include "PS3USB.h"
 #include "CaptainLCD.h"
+#include "Bee.h"
