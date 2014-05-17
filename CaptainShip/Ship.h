@@ -1,4 +1,6 @@
 /*
+ * Copyright © 2013-2014 Kevin Mark
+ *
  * This file is part of Captain.
  *
  * Captain is free software: you can redistribute it and/or modify

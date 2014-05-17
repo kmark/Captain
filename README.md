@@ -22,6 +22,13 @@ Hardware
 * 1x [Pololu High-Power Motor Driver 18v15][PololuDriver]
 * 1x 12V Brushed DC Motor (We pulled one from a cordless drill)
 
+Licensing
+---------
+Copyright &copy; 2013-2014 Kevin Mark
+
+Captain is licensed under the GNU GPLv3. Please see `LICENSE.md` for licensing
+details.
+
 
 [ArduinoUno]: https://www.sparkfun.com/products/11021
 [ArduinoMega]: https://www.sparkfun.com/products/11061
